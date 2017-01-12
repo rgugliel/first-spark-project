@@ -7,12 +7,9 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
-import org.apache.spark.api.java.function.*;
-
 // For the "Word count" example
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
-import java.util.Iterator;
 
 /**
 * Hello world!
@@ -48,21 +45,18 @@ public class App
 		
 		// --------------------------------------------------------
 		// Word count
-		JavaRDD<String> words = jrdd.flatMap(new FlatMapFunction<String, String>() {
-		  public Iterator<String> call(String s) { return Arrays.asList(s.split(" ")).iterator(); }
-		});
+		JavaRDD<String> words = jrdd.flatMap( s -> Arrays.asList(s.split(" ")).iterator() );
+		
 		System.out.println("#words: " + words.count());
+
+		JavaPairRDD<String, Integer> pairs = words.mapToPair( word -> new Tuple2<String, Integer>(word, 1) );
+		JavaPairRDD<String, Integer> wordCount = pairs.reduceByKey( (x,y) -> x+y );
 		
-		JavaPairRDD<String, Integer> pairs = words.mapToPair(new PairFunction<String, String, Integer>() {
-			public Tuple2<String, Integer> call(String s) { return new Tuple2<String, Integer>(s,1); }
-		});
+		System.out.println("Average: " + wordCount.mapToDouble(tuple -> (double)tuple._2).mean());
 		
-		JavaPairRDD<String, Integer> wordCount = pairs.reduceByKey(new Function2<Integer, Integer, Integer>() {
-			public Integer call(Integer x, Integer y) { return x + y; }
-		});
-		
-		wordCount.saveAsTextFile(path + "_wordCount");
-		
+		// Displaying the counting
+		wordCount.foreach( tuple -> System.out.println( "\"" + tuple._1 + "\" appears " + tuple._2 + " times" ));
+
 		// --------------------------------------------------------
 		// De-initialization
 		sc.stop();
