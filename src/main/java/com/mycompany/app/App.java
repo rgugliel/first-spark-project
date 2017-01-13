@@ -11,6 +11,8 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
+import static com.mycompany.app.SerializableComparator.serialize;
+
 /**
 * Hello world!
 *
@@ -18,6 +20,11 @@ import scala.Tuple2;
 public class App 
 {
 	public static void main( String[] args )
+	{
+		new App().Run();
+	}
+	
+	public void Run()
 	{
 		// --------------------------------------------------------
 		// Initialization
@@ -45,17 +52,20 @@ public class App
 		
 		// --------------------------------------------------------
 		// Word count
-		JavaRDD<String> words = jrdd.flatMap( s -> Arrays.asList(s.split(" ")).iterator() );
+		JavaRDD<String> words = jrdd.flatMap(s -> Arrays.asList(s.split(" ")).iterator());
+		JavaPairRDD<String, Integer> pairs = words.mapToPair(word -> new Tuple2<String, Integer>(word, word.isEmpty() ? 0 : 1));
+		JavaPairRDD<String, Integer> wordCount = pairs.reduceByKey((x,y) -> x + y);
 		
 		System.out.println("#words: " + words.count());
-
-		JavaPairRDD<String, Integer> pairs = words.mapToPair( word -> new Tuple2<String, Integer>(word, 1) );
-		JavaPairRDD<String, Integer> wordCount = pairs.reduceByKey( (x,y) -> x+y );
+		System.out.println("#unique words: " + wordCount.count());
 		
 		System.out.println("Average: " + wordCount.mapToDouble(tuple -> (double)tuple._2).mean());
 		
+		Tuple2<String, Integer> wordMax = wordCount.max( serialize((t1, t2) -> t1._2 - t2._2 ) );
+		System.out.println("Max: \"" + wordMax._1 + "\" appears " + wordMax._2 + " times");
+		
 		// Displaying the counting
-		wordCount.foreach( tuple -> System.out.println( "\"" + tuple._1 + "\" appears " + tuple._2 + " times" ));
+		//wordCount.foreach(tuple -> System.out.println("\"" + tuple._1 + "\" appears " + tuple._2 + " times"));
 
 		// --------------------------------------------------------
 		// De-initialization
