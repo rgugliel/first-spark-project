@@ -10,12 +10,14 @@ import org.apache.spark.api.java.JavaSparkContext;
 // For the "Word count" example
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
-
 import static com.mycompany.app.SerializableComparator.serialize;
 
+// See class LineContains below
+import org.apache.spark.api.java.function.Function;
+import java.io.Serializable;
+
 /**
-* Hello world!
-*
+* App
 */
 public class App 
 {
@@ -45,6 +47,7 @@ public class App
 		System.out.println("#lines: " + jrdd.count() );
 		System.out.println("#lines having > 5 words: " + jrdd.filter(line -> line.split(" ").length > 5 ).count());
 		System.out.println("#lines containing Spark: " + jrdd.filter(line -> line.contains("Spark")).count());
+		System.out.println("#lines containing Spark: " + jrdd.filter(new LineContains("Spark")).count());
 		
 		// Number of characters in the file
 		JavaRDD<Integer> jrddLength = jrdd.map(line -> line.length());
@@ -73,5 +76,27 @@ public class App
 		sc.close();
 		
 		System.out.println("END");
+	}
+}
+
+/**
+ * LineContains
+ * @author Rafael
+ * Note: the class must implements Serializable
+ */
+class LineContains implements Function<String, Boolean>, Serializable
+{
+	private String query;
+	
+	public LineContains(String query) {
+		this.query = query;
+	}
+	
+	/**
+	 * Check if the string str contains this.query
+	 * @param str
+	 */
+	public Boolean call(String str) {
+		return str.contains(query);
 	}
 }
