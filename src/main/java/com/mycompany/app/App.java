@@ -64,7 +64,7 @@ public class App
 		
 		System.out.println("Average: " + wordCount.mapToDouble(tuple -> (double)tuple._2).mean());
 		
-		Tuple2<String, Integer> wordMax = wordCount.max( serialize((t1, t2) -> t1._2 - t2._2 ) );
+		Tuple2<String, Integer> wordMax = wordCount.max(serialize((t1, t2) -> t1._2 - t2._2));
 		System.out.println("Max: \"" + wordMax._1 + "\" appears " + wordMax._2 + " times");
 		
 		// Displaying the counting
@@ -81,6 +81,7 @@ public class App
 
 /**
  * LineContains
+ * See second example for "Lines containing Spark above"
  * @author Rafael
  * Note: the class must implements Serializable
  */
