@@ -31,5 +31,11 @@
 		<artifactId>scala-xml_2.11.0-M4</artifactId>
 		<version>1.0-RC1</version>
 	</dependency>
+	
+	<dependency> <!--For the commons-lang.StringUtils -->
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-lang3</artifactId>
+		<version>3.5</version>
+	</dependency>
   </dependencies>
 </project>

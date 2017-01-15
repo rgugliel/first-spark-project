@@ -16,6 +16,8 @@ import static com.mycompany.app.SerializableComparator.serialize;
 import org.apache.spark.api.java.function.Function;
 import java.io.Serializable;
 
+//import org.apache.commons.lang.StringUtils;
+
 /**
 * App
 */
@@ -40,7 +42,8 @@ public class App
 		String path = "SPARKREADME.md";
 
 		System.out.println("Trying to open: " + path);
-		JavaRDD<String> jrdd = sc.textFile(path.toString());
+		// Reading and replacing some special characters with " "
+		JavaRDD<String> jrdd = sc.textFile(path.toString()).map(line -> org.apache.commons.lang.StringUtils.replaceEach(line, new String[] {",", "(", ")", "\"", "[", "]", "#"}, new String[] {"", " ", " ", " ", " ", " ", ""}));
 		
 		// --------------------------------------------------------
 		// First information
