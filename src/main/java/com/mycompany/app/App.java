@@ -1,6 +1,7 @@
 package com.mycompany.app;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 // Basic Spark stuff
 import org.apache.spark.SparkConf;
@@ -71,8 +72,15 @@ public class App
 		
 		System.out.println("Average: " + wordCount.mapToDouble(tuple -> (double)tuple._2).mean());
 		
-		Tuple2<String, Integer> wordMax = wordCount.max(serialize((t1, t2) -> t1._2 - t2._2));
-		System.out.println("Max: \"" + wordMax._1 + "\" appears " + wordMax._2 + " times");
+		// --------------------------------------------------------
+		// Max
+		// First version
+		Tuple2<String, Integer> wordMax1 = wordCount.max(new ComparatorT2SI()); // See below
+		System.out.println("Max: \"" + wordMax1._1 + "\" appears " + wordMax1._2 + " times");
+		
+		// Second version
+		Tuple2<String, Integer> wordMax2 = wordCount.max(serialize((t1, t2) -> t1._2 - t2._2)); // See SerializableComparator.java
+		System.out.println("Max: \"" + wordMax2._1 + "\" appears " + wordMax2._2 + " times");
 		
 		// Displaying the counting
 		//wordCount.foreach(tuple -> System.out.println("\"" + tuple._1 + "\" appears " + tuple._2 + " times"));
@@ -106,5 +114,18 @@ class LineContains implements Function<String, Boolean>, Serializable
 	 */
 	public Boolean call(String str) {
 		return str.contains(query);
+	}
+}
+
+/**
+ * ComparatorT2SI
+ * @author Rafael
+ * Note: the class must implements Serializable
+ */
+class ComparatorT2SI implements Comparator<Tuple2<String, Integer>>, Serializable
+{
+	public int compare( Tuple2<String, Integer> t1, Tuple2<String, Integer> t2 )
+	{
+		return t1._2 - t2._2;
 	}
 }
