@@ -16,7 +16,11 @@ import static com.mycompany.app.SerializableComparator.serialize;
 import org.apache.spark.api.java.function.Function;
 import java.io.Serializable;
 
-//import org.apache.commons.lang.StringUtils;
+/**
+ * Disclaimer: The goal of this example is not to shows best practices and really
+ * scalable examples (for example, we don't use cache, etc). The sole purpose is
+ * to present... examples.
+*/
 
 /**
 * App
