@@ -112,6 +112,7 @@ class LineContains implements Function<String, Boolean>, Serializable
 	 * Check if the string str contains this.query
 	 * @param str
 	 */
+	@Override
 	public Boolean call(String str) {
 		return str.contains(query);
 	}
@@ -124,6 +125,7 @@ class LineContains implements Function<String, Boolean>, Serializable
  */
 class ComparatorT2SI implements Comparator<Tuple2<String, Integer>>, Serializable
 {
+	@Override
 	public int compare( Tuple2<String, Integer> t1, Tuple2<String, Integer> t2 )
 	{
 		return t1._2 - t2._2;
